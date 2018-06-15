@@ -196,8 +196,6 @@ $(document).ready(function () {
      if(parseInt(navigator.appVersion) >= 4){win.window.focus();}
    }
    
-<<<<<<< HEAD
-=======
 
    function searchTag(a){
     var search = a;
@@ -373,13 +371,12 @@ $(document).ready(function () {
          }//else 끝
        }
  //대댓글 파트 끝
->>>>>>> branch 'master' of https://github.com/CHAEIN/traVlog.git
 </script>
 
 
 </head>
 
-<body  onload="InitializeStaticMenu();">
+<body onload="InitializeStaticMenu();">
 <div id="wrap">
       
 <jsp:include page="/resources/util/Page/header.jsp" />

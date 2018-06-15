@@ -133,8 +133,8 @@ public class BoardController {
 			
 			logger.info("대체 여기엔 뭐가들어있는데?"+boardMember.getMemid());
 			logger.info("여기 안돌아가냐?");
-			System.out.println("왜 안나와?"+boardList.get(0).toString());
-			System.out.println("프로필 사진 정보가 들어있나요?"+profileList.get(0).toString());
+//			Logger.info("왜 안나와?"+boardList.get(0).toString());
+//			Logger.info("프로필 사진 정보가 들어있나요?"+profileList.get(0).toString());
 			
 		}else if(member.getSearch() != null || member.getSearch() != "") {
 			//검색어가 있을때..
