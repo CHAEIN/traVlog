@@ -1,41 +1,43 @@
 @charset "UTF-8";
 
 #map {
-	width: 80%;
-	height: 600px;
-	display: none;
-	margin: auto;
-	border: 10px solid #92A8D1;
+   width: 80%;
+   height: 600px;
+   display: none;
+   margin: auto;
+   border: 10px solid #92A8D1;
 }
 
 #default{
+
 	width: 855px;
 	margin: 0 auto;
 	padding-top: 90px;
+
 }
 
 .bodtitle{
-	display: inline-block;
-	width: 600px;
-	margin-bottom: 10px;
+   display: inline-block;
+   width: 600px;
+   margin-bottom: 10px;
 }
 .bodname{
-	display: inline-block;
-	width: 250px; 
-	margin-bottom: 10px;
+   display: inline-block;
+   width: 250px; 
+   margin-bottom: 10px;
 }
 
 .Tdate strong{
-	padding-bottom: 10px;
-	display: inline-block;
+   padding-bottom: 10px;
+   display: inline-block;
     }
 
 #bodcontentCss{
-	margin-top: 10px;
+   margin-top: 10px;
 }
 
 #default label{
-	width:100px;
+   width:100px;
 }
 
 #btnWrite{
@@ -47,10 +49,10 @@ border: 1px solid #92A8D1;
 border-radius: 5px;
 }
 #btnWrite:hover {
-	background-color: #92A8D1;
-	border: 1px solid #92A8D1;
-	color:white;
-	cursor: pointer;
+   background-color: #92A8D1;
+   border: 1px solid #92A8D1;
+   color:white;
+   cursor: pointer;
 }
 
 #btnCalender{
@@ -62,12 +64,11 @@ border: 1px solid #92A8D1;
 border-radius: 5px;
 }
 #btnCalender:hover {
-	background-color: #92A8D1;
-	border: 1px solid #92A8D1;
-	color:white;
-	cursor: pointer;
+   background-color: #92A8D1;
+   border: 1px solid #92A8D1;
+   color:white;
+   cursor: pointer;
 }
-
 
 
 

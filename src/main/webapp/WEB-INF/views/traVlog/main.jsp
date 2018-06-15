@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-   pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
@@ -10,10 +10,23 @@
 
 <link href="/resources/css/main.css" rel="stylesheet">
 <link href="/resources/css/mainContainer.css" rel="stylesheet">
+<link href="/resources/css/mylist.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="https://staticassets-a.styleshare.kr/1ea27d2f8b/css/web.scss.css" />
+
 
 <script type="text/javascript"
    src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-
+<style type="text/css">
+.showComment{
+    overflow-x: hidden;
+    overflow-y: scroll;
+    max-height: 550px;
+}
+.commentNick{
+	font-size: 19px; 
+	padding-right: 10px;
+}
+</style>
 <script type="text/javascript">
 var bodno;
 var stmnLEFT = 10; // 오른쪽 여백 
@@ -92,6 +105,7 @@ var stmnTimer;
           }
           , success: function(data) {
              console.log(data);
+             
 
              if(data.result) {
                 $("#pin_"+a).prop("src", "/resources/images/icon/pined.png");
@@ -148,9 +162,9 @@ $(document).ready(function () {
                
               $.ajax({
                   type:'GET',
-                  url:'/traVlog/addBoardList.do',
+                  url:'/traVlog/addBoardList.do?search='+search,
                     dataType:'html',
-                    data:{"count":count , "search":search},
+                    data:{"count":count },
                     success : function(data){
                        $("#main").html(data);
                        count += 2;
@@ -182,8 +196,8 @@ $(document).ready(function () {
 
    var win= null;
    function claim(mypage,myname,w,h,scroll,bodno){
-	   var claimBodno = bodno;
-	   console.log("claimBodno : "+claimBodno);
+      var claimBodno = bodno;
+      console.log("claimBodno : "+claimBodno);
      var winl = (screen.width-w)/2;
      var wint = (screen.height-h)/2;
      var settings  ='height='+h+',';
@@ -195,18 +209,18 @@ $(document).ready(function () {
      win=window.open(mypage,myname,settings);
      if(parseInt(navigator.appVersion) >= 4){win.window.focus();}
    }
-   
 
    function searchTag(a){
     var search = a;
+	$("#search").val(search);
     count = 2;
     console.log("실행 검색어: "+search);
     
      $.ajax({
           type:'GET',
-          url:'/traVlog/addBoardList.do',
+          url:'/traVlog/addBoardList.do?search='+search,
             dataType:'html',
-            data:{"count":count , "search":search},
+            data:{"count":count},
             success : function(data){
                $("#main").html(data);
             },error:function(data){
@@ -371,147 +385,195 @@ $(document).ready(function () {
          }//else 끝
        }
  //대댓글 파트 끝
+ 
+ 
+ // 화면 넘기기 페이징 <><><>
+ 
+ var slideIndex = 1;
+	showDivs(slideIndex);
+
+	function plusDivs(n) {
+	  showDivs(slideIndex += n);
+	}
+
+	function showDivs(n) {
+	  var i;
+	  var x = document.getElementsByClassName("viewpic");
+	  if (n > x.length) {slideIndex = 1}    
+	  if (n < 1) {slideIndex = x.length}
+	  for (i = 0; i < x.length; i++) {
+	     x[i].style.display = "none";  
+	  }
+	  x[slideIndex-1].style.display = "block";  
+	}
+
 </script>
 
 
 </head>
 
 <body onload="InitializeStaticMenu();">
-<div id="wrap">
-      
-<jsp:include page="/resources/util/Page/header.jsp" />
+	<div id="wrap">
 
-<div id="container"><!-- Begin #container -->
-   <div class="content-wrap-main">
-      <div class="main" id="main">
-      <!-- BoardList 시작 -->
-         
-         <c:forEach items="${boardList }" var="board" varStatus="listNumber" begin="0" end="2">
-         <div class="board">
-            <div class="memInfo">
-            <!--      정민   06.13 게시글별 프로필 이미지 넣기 완료 -->
-	         <c:forEach items="${profileList}" var="Bprofile">
-	         <c:if test="${Bprofile.pfSavefile != null }">
-	         <img class="userimg" src="/resources/upload/${Bprofile.pfSavefile }">
-	         </c:if>
-	         <c:if test="${Bprofile.pfSavefile == null }">
-	         <img class="userimg" src="/resources/upload/icon/user.png">
-	         </c:if>
-	         </c:forEach>
-            <strong class="nick">${board.bodname }</strong>
-            <a href="/traVlog/claim.do?bodno=${board.bodno }" id="claim_${board.bodno }"  onclick="claim(this.href,'name','600','400','yes',${board.bodno});return false"><img class="claim" alt="신고하기" src="/resources/images/icon/claim.png" ></a>
-            </div>
-            
-            <div class="boardInfo">
-            <strong class="title">${board.bodtitle }</strong>
-            <c:if test="${board.startdate != null && board.enddate!=null }">
-               <span class="Bdate">
-               <img class="calender" src="/resources/images/icon/calender.png">
-               ${board.startdate }
-               <img class="airplane" src="/resources/images/icon/airplane.png">
-               ${board.enddate }</span>
-            </c:if>
-            </div>
-<!--             06.14 정민 이미지, 동영상 처리 -->
-         <c:forEach items="${filesList }" var="files" varStatus="listNumber" >   
-            <div class="boardImg">
-            <c:if test="${files.filsavefile != null }">
-               <c:if test="${board.bodno == files.bodno }">
-               <c:set var="filetype" value="${files.filtype }" />
-               
-               <c:if test="${fn:contains(filetype, 'image')}">
-                <img id="img_${files.filsavefile }" class="contentImg"  src="/resources/upload/${files.filsavefile }">
-               </c:if>
-               <c:if test="${fn:contains(filetype, 'video')}">
-                <video id="video_${files.filsavefile }" class="contentImg"  src="/resources/upload/${files.filsavefile }" controls></video>
-               </c:if>
-               </c:if>
-             </c:if>
-            </div>
-         </c:forEach>
-            
-<div class="icon">
-            <!-- 좋아요 기능  -->
-            <button id="recoBtn_${board.bodno}" class="btnRecommend" onclick="recommend(${board.bodno });">
-            <c:if test="${board.isExistsLikeData eq '1'}">
-            <img id="like_${board.bodno}" class="like" width="30px;" src="/resources/images/icon/liked.png" >
-            </c:if>
-            <c:if test="${board.isExistsLikeData eq '0'}">
-            <img id="like_${board.bodno}" class="like" width="30px;" src="/resources/images/icon/like.png">
-            </c:if>
-            </button>
+		<jsp:include page="/resources/util/Page/header.jsp" />
+		<div id="container">
+			<!-- Begin #container -->
+			<div class="content-wrap-main">
+				<div class="main" id="main">
+					<!-- BoardList 시작 -->
 
-            <button><img class="comm" width="30px;" src="/resources/images/icon/comment.png"></button>
-            
-            <!-- 보관기능 -->
-            <button id="pinBtn_${board.bodno}" class="btnPin" onclick="pin(${board.bodno });">
-            <c:if test="${board.isExistsPinData eq '1'}">
-            <img id="pin_${board.bodno}" class="pin" width="30px;" src="/resources/images/icon/pined.png" >
-            </c:if>
-            <c:if test="${board.isExistsPinData eq '0'}">
-            <img id="pin_${board.bodno}" class="pin" width="30px;" src="/resources/images/icon/pin.png">
-            </c:if>
-            </button>
-            
-            </div>
-            
-            <div class="Bcontent">
-            <label>좋아요 <strong id="recommend_${board.bodno }">${board.recommendCnt }</strong> 개</label>
-            <p class="Rcontent">${board.bodcontent }</p>
-            
-            <c:forTokens items="${board.bodhashtag }" delims="#" var="item">
-    		<a href="javascript:void(0);" onclick="javascript:" class="tag">#${item}</a>
-			</c:forTokens>
+					<c:forEach items="${boardList }" var="board" varStatus="listNumber"
+						begin="0" end="2">
+						<div class="board">
+							<div class="memInfo">
+								<!--      정민   06.13 게시글별 프로필 이미지 넣기 완료 -->
+								<c:forEach items="${profileList}" var="Bprofile">
+									<c:if test="${Bprofile.pfSavefile != null }">
+										<img class="userimg"
+											src="/resources/upload/${Bprofile.pfSavefile }">
+									</c:if>
+									<c:if test="${Bprofile.pfSavefile == null }">
+										<img class="userimg" src="/resources/upload/icon/user.png">
+									</c:if>
+								</c:forEach>
+								<strong class="nick">${board.bodname }</strong> <a
+									href="/traVlog/claim.do?bodno=${board.bodno }"
+									id="claim_${board.bodno }"
+									onclick="claim(this.href,'name','600','400','yes',${board.bodno});return false"><img
+									class="claim" alt="신고하기" src="/resources/images/icon/claim.png"></a>
+							</div>
 
-			<!-- 댓글 작성 시작 2018.06.09 -->
-            <div class="Bcomment">
-            <label><strong class="commentNick">${sessionScope.memnick }</strong></label>
-             <input type="text" id="comment_${board.bodno }" name="comment" 
-             placeholder="댓글을 입력하세요 ..." style="width:78%" required="required"></input>
-             <a href="javascript:void(0);" id="commentBtn" style="width:13%;" onclick="javacript:writeComment('${board.bodno}')">댓글입력</a> <br>
-             <div class="showComment" id="showComment_${board.bodno }">
-             
-             </div>
-             <a id="showCommentBtn_${board.bodno }" href="javascript:void(0);" onclick="showCommentBtn('${board.bodno}')" >댓글보기</a>
-            </div>
+							<div class="boardInfo">
+								<strong class="title">${board.bodtitle }</strong>
+								<c:if test="${board.startdate != null && board.enddate!=null }">
+									<span class="Bdate"> <img class="calender"
+										src="/resources/images/icon/calender.png">
+										${board.startdate } <img class="airplane"
+										src="/resources/images/icon/airplane.png">
+										${board.enddate }
+									</span>
+								</c:if>
+							</div>
+							<!--             06.14 정민 이미지, 동영상 처리 -->
+
+							<div class="boardImg">
+								<c:forEach items="${filesList }" var="files"
+									varStatus="listNumber">
+									<c:if test="${files.filsavefile != null }">
+										<c:if test="${board.bodno == files.bodno }">
+											<c:set var="filetype" value="${files.filtype }" />
+
+											<c:if test="${fn:contains(filetype, 'image')}">
+												<img id="img_${files.filsavefile }" class="viewpic"
+													src="/resources/upload/${files.filsavefile }" alt="photo">
+											</c:if>
+											<c:if test="${fn:contains(filetype, 'video')}">
+												<video id="video_${files.filsavefile }" class="contentImg"
+													src="/resources/upload/${files.filsavefile }" controls></video>
+											</c:if>
+										</c:if>
+									</c:if>
+								
+								</c:forEach>
+				
+							</div>
 
 
+							<div class="icon">
+								<!-- 좋아요 기능  -->
+								<button id="recoBtn_${board.bodno}" class="btnRecommend"
+									onclick="recommend(${board.bodno });">
+									<c:if test="${board.isExistsLikeData eq '1'}">
+										<img id="like_${board.bodno}" class="like" width="30px;"
+											src="/resources/images/icon/liked.png">
+									</c:if>
+									<c:if test="${board.isExistsLikeData eq '0'}">
+										<img id="like_${board.bodno}" class="like" width="30px;"
+											src="/resources/images/icon/like.png">
+									</c:if>
+								</button>
 
+								<button>
+									<img class="comm" width="30px;"
+										src="/resources/images/icon/comment.png">
+								</button>
 
-            </div>
-            
-         </div>
-         </c:forEach>
-         <!-- boardList 끝 -->
-         
-      </div>
-      
-      <div class="right" id="STATICMENU">
+								<!-- 보관기능 -->
+								<button id="pinBtn_${board.bodno}" class="btnPin"
+									onclick="pin(${board.bodno });">
+									<c:if test="${board.isExistsPinData eq '1'}">
+										<img id="pin_${board.bodno}" class="pin" width="30px;"
+											src="/resources/images/icon/pined.png">
+									</c:if>
+									<c:if test="${board.isExistsPinData eq '0'}">
+										<img id="pin_${board.bodno}" class="pin" width="30px;"
+											src="/resources/images/icon/pin.png">
+									</c:if>
+								</button>
 
-         <div class="user">
-<!--      정민   06.13 프로필 이미지 넣기 완료 -->
-         <c:forEach items="${profile}" var="profile">
-         <c:if test="${profile.pfSavefile != null }">
-         <img class="userimg" src="/resources/upload/${profile.pfSavefile }">
-         </c:if>
-         <c:if test="${profile.pfSavefile == null }">
-         <img class="userimg" src="/resources/upload/icon/user.png">
-         </c:if>
-         </c:forEach>
-         
-         <c:forEach items="${memberInfo}" var="member">
-         <span class="nick">${member.memnick}</span><br>
-         <span class="id">${member.memid}</span>
-         </c:forEach>
-         </div>
-         
-         <strong>인기 해시태그</strong><br>
+							<div class="Bcontent">
+								<label>좋아요 <strong id="recommend_${board.bodno }">${board.recommendCnt }</strong>
+									개
+								</label>
+								<p class="Rcontent">${board.bodcontent }</p>
+
+								<c:forTokens items="${board.bodhashtag }" delims="#" var="item">
+									<a href="javascript:void(0);" onclick="javascript:searchTag('${item}');" class="tag">#${item}</a>
+								</c:forTokens>
+
+								<!-- 댓글 작성 시작 2018.06.09 -->
+								<div class="Bcomment">
+									<label><strong class="commentNick">${sessionScope.memnick }</strong></label>
+									<input type="text" id="comment_${board.bodno }" name="comment"
+										placeholder="댓글을 입력하세요 ..." style="width: 78%"
+										required="required"></input> <a href="javascript:void(0);"
+										id="commentBtn" style="width: 13%;"
+										onclick="javacript:writeComment('${board.bodno}')">댓글입력</a> <br>
+									<div class="showComment" id="showComment_${board.bodno }">
+
+									</div>
+									<a id="showCommentBtn_${board.bodno }"
+										href="javascript:void(0);"
+										onclick="showCommentBtn('${board.bodno}')">댓글보기</a>
+								</div>
+
+							</div>
+
+						</div>
+						</div>
+					</c:forEach>
+					<!-- boardList 끝 -->
+
+				</div>
+
+				<div class="right" id="STATICMENU">
+
+					<div class="user">
+						<!--      정민   06.13 프로필 이미지 넣기 완료 -->
+						<c:forEach items="${profile}" var="profile">
+							<c:if test="${profile.pfSavefile != null }">
+								<img class="userimg"
+									src="/resources/upload/${profile.pfSavefile }">
+							</c:if>
+							<c:if test="${profile.pfSavefile == null }">
+								<img class="userimg" src="/resources/upload/icon/user.png">
+							</c:if>
+						</c:forEach>
+
+						<c:forEach items="${memberInfo}" var="member">
+							<span class="nick">${member.memnick}</span>
+							<br>
+							<span class="id">${member.memid}</span>
+						</c:forEach>
+					</div>
+
+					<strong>인기 해시태그</strong><br>
          <div class="hashTag">
             <table class="topTag">
                <c:forEach items="${tagList}" var="tag">
                 <tbody>
                     <tr>
-                        <td class="tagname"><a href="#" class="tagA">#${tag.tagname}</a></td>
+                        <td class="tagname"><a href="#" onclick="javascript:searchTag('${tag.tagname}');" class="tagA">#${tag.tagname}</a>
                         <td class="taghit">${tag.taghit}</td>
                     </tr>
                 </tbody>
@@ -531,14 +593,18 @@ $(document).ready(function () {
                 </tbody>
                </c:forEach>
               </table>
-         </div>
-      <div class="goTop" onclick="window.scrollTo(0,0);">TOP</div>
-      </div> <!-- End Right -->
+					</div>
+					<div class="goTop" onclick="window.scrollTo(0,0);">TOP</div>
+				</div>
+				<!-- End Right -->
 
-   </div>   <!-- // End content-wrap -->
-   </div> <!-- End container -->
-   
-</div>   <!-- // End #wrap -->
+			</div>
+			<!-- // End content-wrap -->
+		</div>
+		<!-- End container -->
+
+	</div>
+	<!-- // End #wrap -->
 </body>
 
 </html>

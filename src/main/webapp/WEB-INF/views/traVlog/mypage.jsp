@@ -9,17 +9,21 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>TraVlog Mypage</title>
 
+<script type="text/javascript"
+	src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+	
 <link href="/resources/css/main.css" rel="stylesheet">
 <link href="/resources/css/mypage.css" rel="stylesheet">
 <link href="/resources/css/mylist.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="https://staticassets-a.styleshare.kr/1ea27d2f8b/css/web.scss.css" />
+
 
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 <script
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 
-<script type="text/javascript"
-	src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+
 
 </head>
 
@@ -37,7 +41,7 @@
 						<img class="userimg" src="/resources/images/icon/user.png">
 						<button class="profilebtn"
 							onclick="location.href='settingprofile.do'">프로필 편집</button>
-						<div class="usernick">닉네임</div>
+						<div class="usernick">${selectMember.memnick }</div>
 						<div class="setting">
 							<a href="message.do"><img class="messageimg"
 								src="/resources/images/icon/message.png"></a><br>
@@ -50,10 +54,10 @@
 					<div class="userfollower">
 
 						<div class="following">
-							<strong>10</strong><br /> <span>팔로우</span>
+							<strong>${selectMember.memfollwing }</strong><br /> <span>팔로우</span>
 						</div>
 						<div class="follower">
-							<strong>37</strong><br /> <span>팔로워</span>
+							<strong>${selectMember.memfollower }</strong><br /> <span>팔로워</span>
 						</div>
 						<div class="boardImg">
 							<strong>1</strong><br /> <span>게시글</span>
@@ -63,6 +67,7 @@
 							<a href="settingprofile.do"><img class="settingimg"
 								src="/resources/images/icon/setting.png"></a><br>
 						</div>
+	
 					</div>
 				</div>
 
@@ -70,15 +75,18 @@
 
 					<div class="mylist-content">
 						<div class="row">
-						
+
 							<c:forEach items="${selectpic }" var="i">
-										
-							<div class="pic col-md-4">
-								<a href ="no${i.bodno }"><img class="pic-src"
-									src="/resources/upload/${i.filsavefile }.png" alt="photo"></a>
-							</div>
-							
+								<c:if test="${i.bodno != null }">
+									<div class="pic col-md-4">
+										<a href="no${i.bodno }" onclick="contentview(${i.bodno });">
+											<img class="pic-src"
+											src="/resources/upload/${i.filsavefile }" alt="photo">
+										</a>
+									</div>
+								</c:if>
 							</c:forEach>
+
 
 						</div>
 					</div>
@@ -93,21 +101,11 @@
 	</div>
 	<!-- // End #wrap -->
 
-	<div class="setDiv">
+	<div class="setLayer">
 
 		<div class="mask"></div>
-		<div class="window">
-			<a href ="no${i.bodno }">
-			<img class="pic" src="/resources/upload/${i.filsavefile }.png" alt="photo"></a> <input
-				type="button" href="#" class="close" value="창닫기" />
-				
-		<div class="info">
-		
-		요기가 정보
-		
-		</div>
-		</div>
-		
+		<div class="window"></div>
+
 	</div>
 
 </body>
@@ -141,6 +139,8 @@
 			'top' : top,
 			'position' : 'absolute'
 		});
+		
+		
 
 		// 레이어 팝업을 띄웁니다.
 		$('.window').show();
@@ -151,7 +151,7 @@
 		$('.pic-src').click(function(e) {
 			
 			// preventDefault는 href의 링크 기본 행동을 막는 기능입니다.
-// 			e.preventDefault();
+			e.preventDefault();
 			wrapWindowByMask();
 			
 		});
@@ -168,15 +168,40 @@
 			$('.window').hide();
 		});
 		
-		$("a").click(function() {
-			$("#"+$(this).attr("href")).show();
-			alert('실행대씀');
-			return false;
-		});
+// 		$("a").click(function() {
+// 			$("#"+$(this).attr("href")).show();
+// 			alert('실행대씀');
+// 			return false;
+// 		});
 	});
 	
+	function contentview(a){
+		   var bodno = a;
+		      console.log("bodno : "+bodno);
+		      $.ajax({
+		          type: "get"
+		          , url: "/traVlog/mycontent.do"
+		          , dataType: "html"
+		          , data: {
+		            bodno: bodno
+		          }
+		          , success: function(data) {
+		    
+		             $(".window").html(data);
+		             
+		          }
+		          , error: function(e) {
+		        	  alert("ajax실패");
+
+		          }
+		       });
+		
+		}
 	
 	
+	
+	
+
 </script>
 
 </html>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mvc.dao.CommentDao">
+	<!-- 댓글파트 -->
+	<insert id="insertComment" parameterType="mvc.dto.Comment">
+		INSERT INTO TB_COMMENT(COMNO,BODNO,COMCONTENT,COMWRITTENDATE,COMWRITER)
+		VALUES(UP_COMNO_SEQ.NEXTVAL,#{bodno}, #{comcontent},sysdate,#{comwriter} )
+	</insert>
+	<select id="getCommentListByBodno" parameterType="mvc.dto.Board" resultType="mvc.dto.Comment">
+		SELECT * FROM TB_COMMENT WHERE BODNO = #{bodno} ORDER BY COMWRITTENDATE DESC
+	</select>
+	<delete id="deleteCommentByComno" parameterType="mvc.dto.Comment">
+		DELETE TB_COMMENT WHERE COMNO=#{comno}
+	</delete>
+	<update id="updateCommentByComno" parameterType="mvc.dto.Comment">
+		update tb_comment set comcontent=#{comcontent} where comno=#{comno}
+	</update>
+	
+	<!-- 대댓글파트 -->
+	<select id="getCommentsList" resultType="mvc.dto.Comments">
+		SELECT * FROM TB_COMMENTS
+	</select>
+	<insert id="insertComments" parameterType="mvc.dto.Comments">
+		INSERT INTO TB_COMMENTS(COSNO,COSCONTENT,COSWRITTENDATE,COSWRITER,COMNO)
+		VALUES(UP_COSNO_SEQ.NEXTVAL,#{coscontent},sysdate,#{coswriter},#{comno})
+	</insert>
+	<delete id="deleteCommentsByCosno" parameterType="mvc.dto.Comments">
+		DELETE TB_COMMENTS WHERE COSNO=#{cosno}
+	</delete>
+	<update id="updateCommentsByCosno" parameterType="mvc.dto.Comments">
+		UPDATE TB_COMMENTS SET COSCONTENT=#{coscontent} WHERE COSNO=#{cosno}
+	</update>
+</mapper>

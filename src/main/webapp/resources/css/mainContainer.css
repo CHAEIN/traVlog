@@ -77,6 +77,17 @@ font-style: italic;
 	margin-top: 10px;
 }
 
+.boardImg .viewpic {
+	
+		width: 100%;
+	height: 613px;
+	float: left;
+	position: relative;
+	overflow: hidden;
+	
+}
+
+
 .contentImg{
 	width: 650px;
 	height: 750px;

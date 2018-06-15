@@ -7,6 +7,7 @@
 }
 
 .content-wrap-ff .left{
+
 	position: relative;
 	float: left;
 	width: 600px;
@@ -16,43 +17,45 @@
 .content-wrap-ff .right{
     position: relative;
     margin-left: 600px;
-	width: 600px;
-	border-left: 1px solid #808080;
+   width: 600px;
+   border-left: 1px solid #808080;
 }
 
 .content-wrap-ff strong{
+	
 	color: #797979;
+
 }
 
 .left_content{
-	width: 500px;
-	margin-top: 50px;	
+   width: 500px;
+   margin-top: 50px;   
 }
 
 .right_content{
-	width: 500px;
-	margin-top: 50px;	
+   width: 500px;
+   margin-top: 50px;   
 }
 
 /*세부 설정*/
 .title{
-	font-size: 25px;
-	position: relative;
-	float: left;
-	width: 588px;
-	text-align: center;	
-	padding-bottom: 20px;
+   font-size: 25px;
+   position: relative;
+   float: left;
+   width: 588px;
+   text-align: center;   
+   padding-bottom: 20px;
     border-bottom: 2px solid #797979;
     margin-left: 5px;
 }
 
 .Rimg img{
-	width: 100px;
-	height: 100px;
+   width: 100px;
+   height: 100px;
 }
 .left_content .nick{
-	font-size: 15px;
-	font-weight: bold;
+   font-size: 15px;
+   font-weight: bold;
 }
 .recA{
 color:#393939;
@@ -62,7 +65,7 @@ font-size: 17px;
 }
 
 .recA:hover{
-font-style: italic;	
+font-style: italic;   
 }
 
 .memnick .memA{
@@ -73,7 +76,7 @@ font-size: 17px;
 }
 
 .memnick .memA:hover{
-font-style: italic;	
+font-style: italic;   
 }
 
 .left_content span{
@@ -95,5 +98,5 @@ font-style: italic;
 }
 
 .memfollower, .Rnick {
-	font-size: 15px;
+   font-size: 15px;
 }

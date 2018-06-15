@@ -5,12 +5,25 @@
 
 <mapper namespace="mvc.dao.MypageDao">
 
+	<select id="selectMember" parameterType="mvc.dto.Member" resultType="mvc.dto.Member" >
+		SELECT * FROM TB_MEMBER WHERE memnick = #{memnick}
+	</select>
+
 	<select id="selectPage" parameterType="mvc.dto.Board" resultType="mvc.dto.Board" >
 		SELECT * FROM TB_BOARD WHERE bodname = #{bodname}
 	</select>
 	
 	<select id="selectPic" parameterType="mvc.dto.Board" resultType="mvc.dto.Files" >
-		SELECT * FROM TB_BOARD bod, TB_FILES fil WHERE bod.bodno = fil.bodno and bod.BODNAME = #{bodname}
+		SELECT * FROM TB_BOARD bod, TB_FILES fil WHERE bod.bodno = fil.bodno and bod.bodname = #{bodname} and fil.filidx ='0' order by bod.bodno asc
+	</select>
+	
+	
+	<select id="selectContent" parameterType="mvc.dto.Board" resultType="mvc.dto.Board" >
+		SELECT * FROM TB_BOARD WHERE bodno = #{bodno}
+	</select>
+	
+	<select id="selectContentPic" parameterType="mvc.dto.Board" resultType="mvc.dto.Files" >
+		SELECT * FROM TB_BOARD bod, TB_FILES fil WHERE bod.bodno = #{bodno} and fil.bodno = #{bodno}
 	</select>
 
 </mapper>

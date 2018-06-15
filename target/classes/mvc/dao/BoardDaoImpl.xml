@@ -12,8 +12,8 @@
 		values(UP_BOARD_SEQ.nextval,#{bodtitle},#{bodcontent},#{bodhashtag},sysdate,0,#{bodname})
 	</insert>
 	<insert id="insertFile" parameterType="mvc.dto.Files">
-		insert into TB_FILES(BODNO,FILORIGINFILE,FILSAVEFILE,FILSIZE,FILDATE, FILTYPE)
-		values(#{bodno},#{filoriginfile},#{filsavefile},#{filsize},sysdate, #{filtype})
+		insert into TB_FILES(BODNO, FILIDX,FILORIGINFILE,FILSAVEFILE,FILSIZE,FILDATE, FILTYPE)
+		values(#{bodno},#{filidx},#{filoriginfile},#{filsavefile},#{filsize},sysdate, #{filtype})
 	</insert>
 	<select id="checkHashTag" parameterType="mvc.dto.HashTag" resultType="int">
 		SELECT COUNT(*) FROM TB_HASHTAG WHERE TAGNAME=#{tagname}	
@@ -102,8 +102,9 @@
 		resultType="int">
 		SELECT COUNT(*) FROM tb_keep WHERE bodno = #{bodno }
 	</select>
-	
-		<!-- 검색 리스트 가져오기 -->
+
+	<!-- 검색 리스트 가져오기 -->
+
 	<select id="getBoardListBySearch" parameterType="mvc.dto.Member"
 	resultType="mvc.dto.Board">
 		SELECT b.*, 
@@ -144,7 +145,5 @@
 	<select id="getProfileList" parameterType="mvc.dto.Member" resultType="mvc.dto.Profile">
 	SELECT * FROM tb_profile WHERE memid=#{memid}	
 	</select>
-	
-	
 	
 </mapper>

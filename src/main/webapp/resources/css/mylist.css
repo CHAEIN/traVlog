@@ -93,9 +93,8 @@
 	width: 100%;
 }
 
-.setDiv {
+.setLayer {
 	padding-top: 100px;
-	text-align: center;
 }
 
 .mask {
@@ -122,6 +121,7 @@
 	position: relative;
 	display: block;
 	float:left;
+	overflow: hidden;
 	
 }
 
@@ -133,5 +133,64 @@
 	position: relative;
 	display: block;
 	float:right;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 15px;
 	
 }
+
+.pic .viewpic {
+	width: 100%;
+	height: 613px;
+	float: left;
+	position: relative;
+	overflow: hidden;
+}
+
+.info .profile{
+	
+	border-bottom: 1px solid #efefef;
+    height: 78px;
+    margin-right: 0;
+    padding: 20px 0;
+    position: absolute;
+    right: 24px;
+    top: 0;
+    width: 287px;
+}
+
+.info .profile .profileimg{
+	
+	float:left;
+	height: 50px;
+	width: 50px;
+}
+
+.info .contents{
+
+    border-radius: 6px;
+    padding-top: 12px;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-bottom: 12px;
+    background-color: white;
+    border-color: #E8EBED;
+    border-style: solid;
+    border-width: 1px;
+	
+}
+
+.dropdown{
+	
+	float:right;
+}
+
+.morebutton {
+	
+	border: none;
+    background: white
+
+}
+
+
