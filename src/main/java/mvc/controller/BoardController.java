@@ -28,11 +28,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import mvc.dto.Advertising;
 import mvc.dto.Board;
 import mvc.dto.Claim;
 import mvc.dto.Comment;
 import mvc.dto.Comments;
 import mvc.dto.Files;
+import mvc.dto.Follow;
 import mvc.dto.FollowingRec;
 import mvc.dto.HashTag;
 import mvc.dto.LatLng;
@@ -97,23 +99,42 @@ public class BoardController {
 	}
 	
 	//logout
-//	@RequestMapping(value = "/traVlog/logout.do", method = RequestMethod.GET)
-//	public String logout(Member member, HttpSession session) {
-//		session.invalidate();
-//		return "traVlog/login";
-//	}
+	@RequestMapping(value = "/traVlog/logout.do", method = RequestMethod.GET)
+	public String logout(Member member, HttpSession session) {
+		session.invalidate();
+		return "redirect:/traVlog/login.do";
+	}
 	
 	@RequestMapping(value = "/traVlog/main.do", method = RequestMethod.GET)
 	public String main(Member member, HttpSession session, Model model) {
 		logger.info("메인페이지 GET요청");
 		//로그인한 사용자 아이디 가져오기
 		String memid = (String) session.getAttribute("memid");
-		logger.info(memid);
+		String memnick = (String) session.getAttribute("memnick");
+		logger.info("아이디가 멀까요?"+memid);
+		logger.info("닉네임은?!"+memnick);
 		
+		//광고 정보 가져오기
+		ArrayList<Advertising> adInfo = memberService.adInfo();
+		model.addAttribute("adInfo", adInfo);
+		logger.info("광고정보 들어오나요?"+adInfo);
+				
 		//사용자 정보 가져오기
 		ArrayList<Member> memberInfo = memberService.MemberInfo(memid);
-		ArrayList<Profile> profile = memberService.getProfile(memid);
-		
+
+		//사용자가 등록한 프로필 사진이 있는지 count
+		int isExistsProfile = memberService.countProfile(memnick);
+		String profile = "";
+		if(isExistsProfile >= 1) { //프로필 사진이 있으면...
+			profile = memberService.getProfile(memnick);
+			logger.info("프로필! 뭐가들어있나용"+profile);
+			model.addAttribute("profile", profile);
+		} 
+		else {  //없으면 null
+			profile = "user.png";
+			model.addAttribute("profile", profile);
+			logger.info("넌 뭐냐" + profile);
+		}
 		//인기 해시태그
 		ArrayList<HashTag> tagList = mainService.topHash();
 		
@@ -138,25 +159,33 @@ public class BoardController {
 			model.addAttribute("filesList",filesList);
 			model.addAttribute("profileList",profileList);
 			
-			logger.info("대체 여기엔 뭐가들어있는데?"+boardMember.getMemid());
-			logger.info("여기 안돌아가냐?");
-//			Logger.info("왜 안나와?"+boardList.get(0).toString());
-//			Logger.info("프로필 사진 정보가 들어있나요?"+profileList.get(0).toString());
+//			logger.info("대체 여기엔 뭐가들어있는데?"+boardMember.getMemid());
+//			logger.info("여기 안돌아가냐?");
+//			logger.info("왜 안나와?"+boardList.get(0).toString());
+//			logger.info("프로필 사진 정보가 들어있나요?"+profileList.get(0).toString());
+			
 		}else if(member.getSearch() != null || member.getSearch() != "") {
 			//검색어가 있을때..
+			logger.info("검색어가 존재한다.");
 			boardMember.setSearch(member.getSearch());
 			List<Board> boardList = boardService.getBoardListBySearch(boardMember);
 			model.addAttribute("boardList",boardList);
 
 			List<Files> filesList = boardService.getFiles(boardMember);
 			model.addAttribute("filesList",filesList);
+			model.addAttribute("search",member.getSearch());
 			//06.13 게시글 프로필 사진 추가
 			List<Profile> profileList = boardService.getProfileList(boardMember);
 			model.addAttribute("profileList",profileList);
-			System.out.println(boardList.get(0).toString());
+			logger.info(boardList.get(0).toString());
 		}
-
-
+		
+		/* 지도 정보 가져오기 시작 6.17 */
+		//getAllLatLng는 tb_latlng의 bodno만 가져옴..
+		List<LatLng> mapList = boardService.getAllLatLng();
+		
+		model.addAttribute("mapList",mapList);
+		
 		//일단 3개만 출력하기 위해 count도 보냄
 		int count = 2;
 		//가져오기 끝
@@ -165,7 +194,6 @@ public class BoardController {
 		model.addAttribute("memberInfo", memberInfo);
 		model.addAttribute("tagList", tagList);
 		model.addAttribute("memberList", memList);
-		model.addAttribute("profile", profile);
 		
 		return "traVlog/main";
 	}
@@ -179,17 +207,20 @@ public class BoardController {
 		if(search != "" && search != null) {
 			//검색 값이 존재할 떄
 //			count = count+2;
+			logger.info("검색어가 존재한다.");
 			Member boardMember = new Member();
 			boardMember.setSearch(search);
 			boardMember.setMemid((String)session.getAttribute("memid"));
 			boardMember.setMemnick((String)session.getAttribute("memnick"));
 
-			List<Board> boardList = boardService.getBoardListByFollow(boardMember);
+			List<Board> boardList = boardService.getBoardListBySearch(boardMember);
 			List<Files> filesList = boardService.getFiles(boardMember);
+			model.addAttribute("search",search);
 			model.addAttribute("boardList",boardList);
 			model.addAttribute("filesList",filesList);
 
-		    }else {
+		}else {
+			logger.info("검색값이 없다");
 			//검색 값이 없을 떄
 			count = count+2;
 			Member boardMember = new Member();
@@ -204,6 +235,12 @@ public class BoardController {
 			//06.13 게시글 프로필 사진 추가
 			List<Profile> profileList = boardService.getProfileList(boardMember);
 			model.addAttribute("profileList",profileList);
+			
+			/* 지도 정보 가져오기 시작 6.17 */
+			//getAllLatLng는 tb_latlng의 bodno만 가져옴..
+			List<LatLng> mapList = boardService.getAllLatLng();
+			
+			model.addAttribute("mapList",mapList);
 		}
 		
 		model.addAttribute("count",count);
@@ -231,9 +268,8 @@ public class BoardController {
 		ModelAndView mav;
         String name=(String) paramMap.get("idmemname");
         String e_mail=(String) paramMap.get("idmememail");
-        System.out.println(paramMap);
         String id=memberService.findId(paramMap);
-        System.out.println(id);
+        logger.info(id);
         if(id!=null) {
             email.setContent("[traVlog] 아이디를 확인해주세요.\n "
             		+ "본 메일은 아이디 확인을 위해 발송되는 메일입니다.\n\n\n "
@@ -263,7 +299,7 @@ public class BoardController {
         String id=(String) paramMap.get("pwmemid");
         String e_mail=(String) paramMap.get("pwmememail");
         String pw=memberService.findPw(paramMap);
-        System.out.println(pw);
+        logger.info(pw);
         if(pw!=null) {
             email.setContent("[traVlog] 비밀번호를 변경해주세요.\n "
             		+ "본 메일은 비밀번호 확인을 위해 발송되는 메일입니다.\n "
@@ -304,8 +340,8 @@ public class BoardController {
 			if(list.get(0).getOriginalFilename() != null && list.get(0).getOriginalFilename()!="") {
 				
 			for(int i=0; i<list.size(); i++) {
-				System.out.println(list.get(i).getOriginalFilename());
-				System.out.println("이건가?"+list.get(i).getContentType());
+				logger.info(list.get(i).getOriginalFilename());
+				logger.info("이건가?"+list.get(i).getContentType());
 			}
 			String uID = UUID.randomUUID().toString().split("-")[0];
 			//파일 경로 가져오기
@@ -539,7 +575,7 @@ public class BoardController {
 			//게시글 정보 가져오기
 			logger.info("가져온 게시글 정보"+board.toString());
 			Board claimBoard = boardService.getBoardInfo(board);
-			System.out.println(claimBoard.toString());
+			logger.info(claimBoard.toString());
 			
 			model.addAttribute("claimBoard",claimBoard);
 		}
@@ -620,6 +656,59 @@ public class BoardController {
 			model.addAttribute("commentList",commentList);
 
 		}
+		
+		//친구찾기 ajax 작동
+		@RequestMapping(value="/traVlog/followerFindBySearch.do", method=RequestMethod.GET)
+		public void findFollower(HttpSession session, Model model, Member member) {
+			logger.info("친구검색(followerFindBySearch) GET요청");
+			logger.info("받아온 member.search정보"+member.getSearch());
+			//현재 로그인중인 사람의 id를 가지고 오기..
+			String memid = (String) session.getAttribute("memid");
+			member.setMemid(memid);
+			logger.info("session memnick : "+memid);
+			List<Member> searchMemberList = mainService.getMemberListBySearch(member);
+			List<FollowingRec> recList = mainService.recommend(memid);
+			
+			
+			model.addAttribute("searchMemberList",searchMemberList);
+			model.addAttribute("recList", recList);
+		}
+		
+		//친구찾기에서 팔로우기능 하기..
+	@ResponseBody
+	@RequestMapping(value = "/traVlog/doFollow.do", method = RequestMethod.POST)
+	public HashMap<String, Object> checkId(HttpSession session,String memnick) {
+		
+		logger.info(memnick);
+		Follow insertFollow = new Follow();
+		Member member = new Member();
+		member.setMemnick(memnick);
+		member = memberService.getMemberByNick(member);
+		logger.info(member.toString());
+		insertFollow.setFlwid(member.getMemid());
+		insertFollow.setMemid((String)session.getAttribute("memid"));
+		memberService.insertFollow(insertFollow);
+		
+		HashMap<String, Object> hashmap = new HashMap<String, Object>();
+		hashmap.put("KEY", "YES");
+
+		return hashmap;
+	}
+
+	//메인 게시글에 지도정보 가져오는  ajax
+	@RequestMapping(value = "/traVlog/showMap.do", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<Object,List<LatLng>> showMap(LatLng latlng) {
+		logger.info("메인페이지 지도요청 AJAX 실행");
+		logger.info("가져온 bodno : "+latlng.getBodno());
+		
+		List<LatLng> positionXY = boardService.getPositionListByBodno(latlng);
+		
+		Map<Object, List<LatLng>> map = new HashMap<>();
+		map.put("posiXY", positionXY);
+		
+		return map;
+	}
 }
 
 

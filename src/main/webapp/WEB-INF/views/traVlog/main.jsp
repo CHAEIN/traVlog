@@ -8,6 +8,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>TraVlog</title>
 
+<!-- 다음 map -->
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=8d0237c9907bee104ad426d666bbc73e"></script>
+
 <link href="/resources/css/main.css" rel="stylesheet">
 <link href="/resources/css/mainContainer.css" rel="stylesheet">
 <link href="/resources/css/mylist.css" rel="stylesheet">
@@ -17,19 +20,18 @@
 <script type="text/javascript"
    src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <style type="text/css">
-.showComment{
-    overflow-x: hidden;
-    overflow-y: scroll;
-    max-height: 550px;
-}
-.commentNick{
-	font-size: 19px; 
-	padding-right: 10px;
+
+<!-- 맵 스타일 추가 -->
+.boardMap{
+	width: 550px;
+	height: 375px;
+	display: block;
+	border: 3px solid #92A8D1;
 }
 </style>
 <script type="text/javascript">
 var bodno;
-var stmnLEFT = 10; // 오른쪽 여백 
+var stmnLEFT = 0; // 오른쪽 여백 
 var stmnGAP1 = 0; // 위쪽 여백 
 var stmnGAP2 = 10; // 스크롤시 브라우저 위쪽과 떨어지는 거리 
 var stmnBASE = 10; // 스크롤 시작위치 
@@ -37,31 +39,32 @@ var stmnActivateSpeed = 35; //스크롤을 인식하는 딜레이 (숫자가 클
 var stmnScrollSpeed = 1000; //스크롤 속도 (클수록 느림)
 var stmnTimer; 
   
-  function RefreshStaticMenu() {
-     var stmnStartPoint, stmnEndPoint;
-     stmnStartPoint = parseInt(
-           document.getElementById('STATICMENU').style.top, 10);
-     stmnEndPoint = Math.max(document.documentElement.scrollTop,
-           document.body.scrollTop)
-           + stmnGAP2;
-     if (stmnEndPoint < stmnGAP1)
-        stmnEndPoint = stmnGAP1;
-     if (stmnStartPoint != stmnEndPoint) {
-        stmnScrollAmount = Math.ceil(Math
-              .abs(stmnEndPoint - stmnStartPoint) / 15);
-        document.getElementById('STATICMENU').style.top =
-           parseInt(document.getElementById('STATICMENU').style.top, 10) + ((stmnEndPoint < stmnStartPoint) ? -stmnScrollAmount
-                    : stmnScrollAmount) + 'px';
-        stmnRefreshTimer = stmnScrollSpeed;
-     }
-     stmnTimer = setTimeout("RefreshStaticMenu();", stmnActivateSpeed);
-  }
-  function InitializeStaticMenu() {
-     document.getElementById('STATICMENU').style.right = stmnLEFT + 'px'; //처음에 오른쪽에 위치. left로 바꿔도.
-     document.getElementById('STATICMENU').style.top = document.body.scrollTop
-           + stmnBASE + 'px';
-     RefreshStaticMenu();
-  }
+function RefreshStaticMenu() {
+    var stmnStartPoint, stmnEndPoint;
+    stmnStartPoint = parseInt(
+          document.getElementById('STATICMENU').style.top, 10);
+    stmnEndPoint = Math.max(document.documentElement.scrollTop,
+          document.body.scrollTop)
+          + stmnGAP2;
+    if (stmnEndPoint < stmnGAP1)
+       stmnEndPoint = stmnGAP1;
+    if (stmnStartPoint != stmnEndPoint) {
+       stmnScrollAmount = Math.ceil(Math
+             .abs(stmnEndPoint - stmnStartPoint) / 15);
+       document.getElementById('STATICMENU').style.top =
+          parseInt(document.getElementById('STATICMENU').style.top, 10) + ((stmnEndPoint < stmnStartPoint) ? -stmnScrollAmount
+                   : stmnScrollAmount) + 'px';
+       stmnRefreshTimer = stmnScrollSpeed;
+    }
+    stmnTimer = setTimeout("RefreshStaticMenu();", stmnActivateSpeed);
+ }
+ 
+ function InitializeStaticMenu() {
+    document.getElementById('STATICMENU').style.top = document.body.scrollTop
+          + stmnBASE + 'px';
+    
+    RefreshStaticMenu();
+ }
 
    function recommend(a){
       var bodno = a;
@@ -248,6 +251,8 @@ $(document).ready(function () {
             success : function(data){
                   console.log("성공?");
                      $("#showComment_"+bodno).html(data);
+                     //댓글작성하고나서 작성칸 비워달라그래서 넣어줌..
+                     $("#comment_"+bodno).val("");
                      $("#showCommentBtn_"+bodno).text("댓글안보기");
                   },error:function(data){
                      alert("실패");
@@ -410,164 +415,249 @@ $(document).ready(function () {
 </script>
 
 
+
 </head>
 
 <body onload="InitializeStaticMenu();">
-	<div id="wrap">
+<div id="wrap">
 
-		<jsp:include page="/resources/util/Page/header.jsp" />
-		<div id="container">
-			<!-- Begin #container -->
-			<div class="content-wrap-main">
-				<div class="main" id="main">
-					<!-- BoardList 시작 -->
+	<jsp:include page="/resources/util/Page/header.jsp" />
+<div id="container">
+	<!-- Begin #container -->
+<div class="content-wrap-main">
+	<div class="main" id="main">
+		<!-- BoardList 시작 -->
 
-					<c:forEach items="${boardList }" var="board" varStatus="listNumber"
-						begin="0" end="2">
-						<div class="board">
-							<div class="memInfo">
-								<!--      정민   06.13 게시글별 프로필 이미지 넣기 완료 -->
-								<c:forEach items="${profileList}" var="Bprofile">
-									<c:if test="${Bprofile.pfSavefile != null }">
-										<img class="userimg"
-											src="/resources/upload/${Bprofile.pfSavefile }">
-									</c:if>
-									<c:if test="${Bprofile.pfSavefile == null }">
-										<img class="userimg" src="/resources/upload/icon/user.png">
-									</c:if>
-								</c:forEach>
-								<strong class="nick">${board.bodname }</strong> <a
-									href="/traVlog/claim.do?bodno=${board.bodno }"
-									id="claim_${board.bodno }"
-									onclick="claim(this.href,'name','600','400','yes',${board.bodno});return false"><img
-									class="claim" alt="신고하기" src="/resources/images/icon/claim.png"></a>
-							</div>
-
-							<div class="boardInfo">
-								<strong class="title">${board.bodtitle }</strong>
-								<c:if test="${board.startdate != null && board.enddate!=null }">
-									<span class="Bdate"> <img class="calender"
-										src="/resources/images/icon/calender.png">
-										${board.startdate } <img class="airplane"
-										src="/resources/images/icon/airplane.png">
-										${board.enddate }
-									</span>
-								</c:if>
-							</div>
-							<!--             06.14 정민 이미지, 동영상 처리 -->
-
-							<div class="boardImg">
-								<c:forEach items="${filesList }" var="files"
-									varStatus="listNumber">
-									<c:if test="${files.filsavefile != null }">
-										<c:if test="${board.bodno == files.bodno }">
-											<c:set var="filetype" value="${files.filtype }" />
-
-											<c:if test="${fn:contains(filetype, 'image')}">
-												<img id="img_${files.filsavefile }" class="viewpic"
-													src="/resources/upload/${files.filsavefile }" alt="photo">
-											</c:if>
-											<c:if test="${fn:contains(filetype, 'video')}">
-												<video id="video_${files.filsavefile }" class="contentImg"
-													src="/resources/upload/${files.filsavefile }" controls></video>
-											</c:if>
-										</c:if>
-									</c:if>
-								
-								</c:forEach>
-				
-							</div>
-
-
-							<div class="icon">
-								<!-- 좋아요 기능  -->
-								<button id="recoBtn_${board.bodno}" class="btnRecommend"
-									onclick="recommend(${board.bodno });">
-									<c:if test="${board.isExistsLikeData eq '1'}">
-										<img id="like_${board.bodno}" class="like" width="30px;"
-											src="/resources/images/icon/liked.png">
-									</c:if>
-									<c:if test="${board.isExistsLikeData eq '0'}">
-										<img id="like_${board.bodno}" class="like" width="30px;"
-											src="/resources/images/icon/like.png">
-									</c:if>
-								</button>
-
-								<button>
-									<img class="comm" width="30px;"
-										src="/resources/images/icon/comment.png">
-								</button>
-
-								<!-- 보관기능 -->
-								<button id="pinBtn_${board.bodno}" class="btnPin"
-									onclick="pin(${board.bodno });">
-									<c:if test="${board.isExistsPinData eq '1'}">
-										<img id="pin_${board.bodno}" class="pin" width="30px;"
-											src="/resources/images/icon/pined.png">
-									</c:if>
-									<c:if test="${board.isExistsPinData eq '0'}">
-										<img id="pin_${board.bodno}" class="pin" width="30px;"
-											src="/resources/images/icon/pin.png">
-									</c:if>
-								</button>
-
-							<div class="Bcontent">
-								<label>좋아요 <strong id="recommend_${board.bodno }">${board.recommendCnt }</strong>
-									개
-								</label>
-								<p class="Rcontent">${board.bodcontent }</p>
-
-								<c:forTokens items="${board.bodhashtag }" delims="#" var="item">
-									<a href="javascript:void(0);" onclick="javascript:searchTag('${item}');" class="tag">#${item}</a>
-								</c:forTokens>
-
-								<!-- 댓글 작성 시작 2018.06.09 -->
-								<div class="Bcomment">
-									<label><strong class="commentNick">${sessionScope.memnick }</strong></label>
-									<input type="text" id="comment_${board.bodno }" name="comment"
-										placeholder="댓글을 입력하세요 ..." style="width: 78%"
-										required="required"></input> <a href="javascript:void(0);"
-										id="commentBtn" style="width: 13%;"
-										onclick="javacript:writeComment('${board.bodno}')">댓글입력</a> <br>
-									<div class="showComment" id="showComment_${board.bodno }">
-
-									</div>
-									<a id="showCommentBtn_${board.bodno }"
-										href="javascript:void(0);"
-										onclick="showCommentBtn('${board.bodno}')">댓글보기</a>
-								</div>
-
-							</div>
-
-						</div>
-						</div>
+		<c:forEach items="${boardList }" var="board" varStatus="listNumber"
+			begin="0" end="2">
+			<div class="board">
+				<div class="memInfo">
+					<c:set var="loop_flag" value="false" />
+					<c:forEach items="${profileList}" var="profileList">
+					<c:if test="${not loop_flag }">
+					<c:choose>
+						<c:when test="${profileList.memnick == board.bodname }">
+							<img class="userimg"
+							src="/resources/upload/${profileList.pfSavefile }">
+						</c:when>
+						<c:when test="${profileList.memnick != board.bodname }">
+							<img class="userimg" src="/resources/images/icon/user.png">
+							<c:set var="loop_flag" value="true" />
+						</c:when>
+					</c:choose>
+					</c:if>
 					</c:forEach>
-					<!-- boardList 끝 -->
+					<strong class="nick">${board.bodname }</strong> <a
+						href="/traVlog/claim.do?bodno=${board.bodno }"
+						id="claim_${board.bodno }"
+						onclick="claim(this.href,'name','600','400','yes',${board.bodno});return false"><img
+						class="claim" alt="신고하기" src="/resources/images/icon/claim.png"></a>
+				</div>
+
+				<div class="boardInfo">
+					<strong class="title">${board.bodtitle }</strong>
+					<c:if test="${board.startdate != null && board.enddate!=null }">
+						<span class="Bdate"> <img class="calender"
+							src="/resources/images/icon/calender.png">
+							${board.startdate } <img class="airplane"
+							src="/resources/images/icon/airplane.png">
+							${board.enddate }
+						</span>
+					</c:if>
+				</div>
+				<!--             06.14 정민 이미지, 동영상 처리 -->
+
+				<div class="boardImg">
+					<c:forEach items="${filesList }" var="files"
+						varStatus="listNumber">
+						<c:if test="${files.filsavefile != null }">
+							<c:if test="${board.bodno == files.bodno }">
+								<c:set var="filetype" value="${files.filtype }" />
+
+								<c:if test="${fn:contains(filetype, 'image')}">
+									<img id="img_${files.filsavefile }" class="viewpic"
+										src="/resources/upload/${files.filsavefile }" alt="photo">
+								</c:if>
+								<c:if test="${fn:contains(filetype, 'video')}">
+									<video id="video_${files.filsavefile }" class="contentImg"
+										src="/resources/upload/${files.filsavefile }" controls></video>
+								</c:if>
+							</c:if>
+						</c:if>
+					
+					</c:forEach>
+	
+				</div>
+
+				<div class="icon">
+					<!-- 좋아요 기능  -->
+					<button id="recoBtn_${board.bodno}" class="btnRecommend"
+						onclick="recommend(${board.bodno });">
+						<c:if test="${board.isExistsLikeData eq '1'}">
+							<img id="like_${board.bodno}" class="like" width="30px;"
+								src="/resources/images/icon/liked.png">
+						</c:if>
+						<c:if test="${board.isExistsLikeData eq '0'}">
+							<img id="like_${board.bodno}" class="like" width="30px;"
+								src="/resources/images/icon/like.png">
+						</c:if>
+					</button>
+
+					<!-- 보관기능 -->
+					<button id="pinBtn_${board.bodno}" class="btnPin"
+						onclick="pin(${board.bodno });">
+						<c:if test="${board.isExistsPinData eq '1'}">
+							<img id="pin_${board.bodno}" class="pin" width="30px;"
+								src="/resources/images/icon/pined.png">
+						</c:if>
+						<c:if test="${board.isExistsPinData eq '0'}">
+							<img id="pin_${board.bodno}" class="pin" width="30px;"
+								src="/resources/images/icon/pin.png">
+						</c:if>
+					</button>
+
+				<div class="Bcontent">
+					<label>좋아요 <strong id="recommend_${board.bodno }">${board.recommendCnt }</strong>
+						개
+					</label>
+					<p class="Rcontent">${board.bodcontent }</p>
+
+					<c:forTokens items="${board.bodhashtag }" delims="#" var="item">
+						<a href="javascript:void(0);" onclick="javascript:searchTag('${item}');" class="tag">#${item}</a>
+					</c:forTokens>
+				
+					<!-- 지도 띄우기 시도..06.17 -->
+					<c:forEach items="${mapList }" var="map">
+						<c:if test="${map.bodno == board.bodno}">
+							<a id="aMap_${map.bodno }" href="javascript:void(0);" onclick="javascript:showMap('${map.bodno}')">지도보기</a>
+						</c:if>
+					</c:forEach>
+					<div id="boardMap_${board.bodno}" class="boardMap">
+					</div>
+					<!-- 지도 띄우기 시도..끝 -->
+<script type="text/javascript">
+//지도 보여주는 스크립트 새로 추가함 6.17
+var mapX;
+var mapY;
+var xlist,ylist;
+//position정보를 가져와서 첫번쨰 인덱스를 중심으로 지도를 그리고
+//position정보 list수만큼 마커를 찍는다.
+function makeDaumMap(bodno){
+	console.log(mapX+","+mapY);
+	var container = document.getElementById("boardMap_"+bodno);
+	console.log(container);
+	var options = {
+		center : new daum.maps.LatLng(mapX,mapY),
+		level : 5
+	};
+	
+	var map = new daum.maps.Map(container, options);
+	
+	// 지도를 재설정할 범위정보를 가지고 있을 LatLngBounds 객체를 생성합니다
+	var bounds = new daum.maps.LatLngBounds();
+	
+	for (var i = 0; i < xlist.length; i ++) {
+		console.log("마커 생성하러 왔다.");
+	    // 마커를 생성합니다
+	    var marker = new daum.maps.Marker({
+	        map: map, // 마커를 표시할 지도
+	        position: new daum.maps.LatLng(xlist[i], ylist[i]) // 마커를 표시할 위치
+	    });
+	 // LatLngBounds 객체에 좌표를 추가합니다
+	    bounds.extend(new daum.maps.LatLng(xlist[i], ylist[i]));
+	}
+	map.setBounds(bounds);
+}
+
+function showMap(bodno){
+	mapX=null;
+	mapY=null;
+	xlist=[];
+	ylist=[];
+	
+	console.log("showMap 클릭됨.. bodno = "+bodno);
+	if ($("#aMap_" + bodno).text() == "지도보기"){
+		$("#boardMap_" + bodno).css("display", "block");
+		$("#boardMap_" + bodno).css("width","100%");
+		$("#boardMap_" + bodno).css("height","375px");
+		$("#aMap_" + bodno).text("지도감추기");
+		
+		//지도 position(좌표정보) 가져오기.
+		$.ajax({
+			type:'post',
+			url:'/traVlog/showMap.do',
+			data:{"bodno":bodno},
+			dataType:'json',
+			success:function(d){
+				console.log("지도 position가져오기 ajax 성공");
+				mapX = d.posiXY[0].positionx;
+				mapY = d.posiXY[0].positiony;
+				
+				for(var i=0; i<d.posiXY.length;i++){
+					//지도 및 마커 생성
+					console.log("posiXY"+"("+i+")"+" : "+d.posiXY[i].positionx+","+d.posiXY[i].positiony);
+					xlist.push(d.posiXY[i].positionx);
+					ylist.push(d.posiXY[i].positiony);
+				}
+				makeDaumMap(bodno);
+			},error:function(e){
+				console.log("지도 position가져오기 ajax 실패");
+			}
+		});
+	} else {
+		$("#boardMap_" + bodno).css("display", "none");
+		$("#aMap_" + bodno).text("지도보기");
+	}
+}
+
+
+</script>
+								<!-- 댓글 작성 시작 2018.06.09 -->
+					<div class="Bcomment">
+						<label><strong class="commentNick">${sessionScope.memnick }</strong></label>
+						<input type="text" id="comment_${board.bodno }" name="comment"
+							placeholder="댓글을 입력하세요 ..." style="width: 78%"
+							required="required"></input> <a href="javascript:void(0);"
+							id="commentBtn" style="width: 13%;"
+							onclick="javacript:writeComment('${board.bodno}')">댓글입력</a> <br>
+						<div class="showComment" id="showComment_${board.bodno }">
+
+						</div>
+						<a id="showCommentBtn_${board.bodno }"
+							href="javascript:void(0);"
+							onclick="showCommentBtn('${board.bodno}')">댓글보기</a>
+					</div>
 
 				</div>
 
-				<div class="right" id="STATICMENU">
+			</div>
+			</div>
+		</c:forEach>
+		<!-- boardList 끝 -->
 
-					<div class="user">
-						<!--      정민   06.13 프로필 이미지 넣기 완료 -->
-						<c:forEach items="${profile}" var="profile">
-							<c:if test="${profile.pfSavefile != null }">
-								<img class="userimg"
-									src="/resources/upload/${profile.pfSavefile }">
-							</c:if>
-							<c:if test="${profile.pfSavefile == null }">
-								<img class="userimg" src="/resources/upload/icon/user.png">
-							</c:if>
-						</c:forEach>
+	</div>
 
-						<c:forEach items="${memberInfo}" var="member">
-							<span class="nick">${member.memnick}</span>
-							<br>
-							<span class="id">${member.memid}</span>
-						</c:forEach>
-					</div>
 
-					<strong>인기 해시태그</strong><br>
+<div class="menuBar" id="STATICMENU">
+	<div class="right">
+
+		<div class="user">
+			<!--      정민   06.13 프로필 이미지 넣기 완료 -->
+			<c:forEach items="${profile}" var="profile">
+				<c:if test="${profile != null }">
+					<img class="userimg"
+						src="/resources/upload/${profile}">
+				</c:if>
+			</c:forEach>
+	
+			<c:forEach items="${memberInfo}" var="member">
+				<span class="nick">${member.memnick}</span>
+				<br>
+				<span class="id">${member.memid}</span>
+			</c:forEach>
+		</div>
+
+		<strong>인기 해시태그</strong><br>
          <div class="hashTag">
             <table class="topTag">
                <c:forEach items="${tagList}" var="tag">
@@ -583,7 +673,7 @@ $(document).ready(function () {
          
          <strong>인기 사용자</strong><br>
          <div class="follower">
-         <table class="topMember">
+         	<table class="topMember">
                <c:forEach items="${memberList}" var="mem">
                 <tbody>
                     <tr>
@@ -593,18 +683,47 @@ $(document).ready(function () {
                 </tbody>
                </c:forEach>
               </table>
-					</div>
-					<div class="goTop" onclick="window.scrollTo(0,0);">TOP</div>
-				</div>
-				<!-- End Right -->
-
-			</div>
-			<!-- // End content-wrap -->
+		  </div>
+		<div class="goTop" onclick="window.scrollTo(0,0);">TOP</div>
+	</div> <!-- right End -->
+		
+				
+	<div class="left">
+	
+		<div class="user">
+			<c:forEach items="${adInfo}" var="adInfo">
+				<span class="nick">${adInfo.advname}</span>
+				<br>
+				<strong>${adInfo.advtitle}</strong><br>
+			</c:forEach>
 		</div>
-		<!-- End container -->
 
-	</div>
-	<!-- // End #wrap -->
+         <div class="adver">
+            <table class="adContent">
+               <c:forEach items="${adInfo}" var="adInfo">
+                <hr>
+                <c:if test="${adInfo.advfile != null }">
+                	<img class="adimg"
+						src="/resources/upload/${adInfo.advfile}">
+				</c:if>
+                <span class="content">${adInfo.advcontent}</span>
+               </c:forEach>
+              </table>
+         </div>
+         
+
+		<div class="goTop" onclick="window.scrollTo(0,0);">TOP</div>
+				</div>	<!-- Left End -->
+</div> <!-- menuBar End -->
+
+
+</div>
+<!-- // End content-wrap -->
+</div>
+<!-- End container -->
+
+</div>
+<!-- // End #wrap -->
 </body>
 
 </html>

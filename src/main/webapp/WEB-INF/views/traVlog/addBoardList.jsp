@@ -14,15 +14,17 @@
 				value="${board.bodno }">
 			<div class="memInfo">
 				<!--      정민   06.13 게시글별 프로필 이미지 넣기 완료 -->
-				<c:forEach items="${profileList}" var="Bprofile">
-					<c:if test="${Bprofile.pfSavefile != null }">
-						<img class="userimg"
-							src="/resources/upload/${Bprofile.pfSavefile }">
-					</c:if>
-					<c:if test="${Bprofile.pfSavefile == null }">
-						<img class="userimg" src="/resources/upload/icon/user.png">
-					</c:if>
-				</c:forEach>
+				 <c:forEach items="${profileList}" var="profileList">
+               <c:if test="${profileList.pfSavefile != null }">
+                  <c:if test="${profileList.memnick eq board.bodname}">
+                  <img class="userimg"
+                     src="/resources/upload/${profileList.pfSavefile }">
+                  </c:if>
+               </c:if>
+	               <c:if test="${profileList.pfSavefile == null }">
+	                  <img class="userimg" src="/resources/upload/icon/user.png">
+	               </c:if>
+            	</c:forEach>
 				<strong class="nick">${board.bodname }</strong> <a
 					href="/traVlog/claim.do?bodno=${board.bodno }"
 					id="claim_${board.bodno }"
@@ -75,12 +77,6 @@
 							src="/resources/images/icon/like.png">
 					</c:if>
 				</button>
-
-				<button>
-					<img class="comm" width="30px;"
-						src="/resources/images/icon/comment.png">
-				</button>
-
 				<!-- 보관기능 -->
 				<button id="pinBtn_${board.bodno}" class="btnPin"
 					onclick="pin(${board.bodno });">
@@ -104,6 +100,15 @@
 					<a href="javascript:void(0);"
 						onclick="javascript:searchTag('${item}');" class="tag">#${item}</a>
 				</c:forTokens>
+				<!-- 지도 띄우기 시도..06.17 -->
+				<c:forEach items="${mapList }" var="map">
+					<c:if test="${map.bodno == board.bodno}">
+						<a id="aMap_${map.bodno }" href="javascript:void(0);"
+							onclick="javascript:showMap('${map.bodno}')">지도보기</a>
+					</c:if>
+				</c:forEach>
+				<div id="boardMap_${board.bodno}" class="boardMap"></div>
+				<!-- 지도 띄우기 시도..끝 -->
 			</div>
 			<!-- 댓글 작성 시작 2018.06.09 -->
 

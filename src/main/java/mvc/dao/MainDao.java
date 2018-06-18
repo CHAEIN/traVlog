@@ -1,6 +1,7 @@
 package mvc.dao;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import mvc.dto.Member;
 import mvc.dto.FollowingRec;
@@ -21,5 +22,7 @@ public interface MainDao {
 	public int countFolMember(String memid);
 
 	public ArrayList<FollowingRec> admin();
+
+	public List<Member> getMemberListBySearch(Member member);
 	
 }

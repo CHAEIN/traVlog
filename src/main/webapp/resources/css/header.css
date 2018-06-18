@@ -38,10 +38,10 @@
 	padding-left: 30px;
 }
 
-.header .feed{
-	display: block;
-	float: right;
-	padding-left: 30px;
+.header .logout{
+   display: block;
+   float: right;
+   padding-left: 30px;
 }
 
 #searchBtn{

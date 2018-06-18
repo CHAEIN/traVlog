@@ -9,7 +9,7 @@
 	</select>
 	<insert id="insertBoard" parameterType="mvc.dto.Board">
 		insert into TB_BOARD(BODNO,BODTITLE,BODCONTENT,BODHASHTAG,BODDATE,BODRECOMMEND,BODNAME)
-		values(UP_BOARD_SEQ.nextval,#{bodtitle},#{bodcontent},#{bodhashtag},sysdate,0,#{bodname})
+		values(UP_bodNo.nextval,#{bodtitle},#{bodcontent},#{bodhashtag},sysdate,0,#{bodname})
 	</insert>
 	<insert id="insertFile" parameterType="mvc.dto.Files">
 		insert into TB_FILES(BODNO, FILIDX,FILORIGINFILE,FILSAVEFILE,FILSIZE,FILDATE, FILTYPE)
@@ -20,7 +20,7 @@
 	</select>
 	<insert id="insertHashTag" parameterType="mvc.dto.HashTag">
 		INSERT INTO TB_HASHTAG(TAGNO,TAGNAME,TAGHIT,TAGOPEN)
-		VALUES(UP_TAGNO_SEQ.NEXTVAL, #{tagname},0,'open')
+		VALUES(UP_tagNo.NEXTVAL, #{tagname},0,'open')
 	</insert>
 	<update id="updateHashTagHit" parameterType="mvc.dto.HashTag">
 		UPDATE TB_HASHTAG SET TAGHIT = TAGHIT+1 WHERE TAGNAME=#{tagname}
@@ -142,8 +142,14 @@
 	SELECT bod.bodno, fil.filsavefile, fil.filtype FROM TB_BOARD bod, TB_FILES fil WHERE bod.bodno = fil.bodno and bod.BODNAME = #{memnick}
 	</select>
 	
-	<select id="getProfileList" parameterType="mvc.dto.Member" resultType="mvc.dto.Profile">
-	SELECT * FROM tb_profile WHERE memid=#{memid}	
+  <select id="getProfileList" parameterType="mvc.dto.Member" resultType="mvc.dto.Profile">
+   SELECT distinct * FROM tb_profile
+   </select>
+   
+	<select id="getAllLatLng" resultType="mvc.dto.LatLng">
+	SELECT DISTINCT BODNO FROM TB_POSITION
 	</select>
-	
+	<select id="getPositionListByBodno" parameterType="mvc.dto.LatLng" resultType="mvc.dto.LatLng">
+	SELECT POSITIONX, POSITIONY FROM TB_POSITION WHERE BODNO=#{bodno}
+	</select>
 </mapper>

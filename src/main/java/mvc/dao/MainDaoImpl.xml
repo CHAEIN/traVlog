@@ -104,4 +104,10 @@
 		WHERE memid = 'ad_traVlog'
 	</select>
 	
+	<select id="getMemberListBySearch" parameterType="mvc.dto.Member" resultType="mvc.dto.Member">
+		SELECT MEMNICK FROM TB_MEMBER WHERE MEMNICK LIKE '%'||#{search}||'%' AND MEMID 
+                            NOT IN (#{memid})
+                            AND MEMID NOT IN (SELECT FLWID FROM TB_FOLLOW F
+		                    WHERE F.MEMID = #{memid})
+	</select>
 </mapper>

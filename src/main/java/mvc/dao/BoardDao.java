@@ -69,4 +69,8 @@ public interface BoardDao {
 
 	public List<Profile> getProfileList(Member boardMember);
 
+	public List<LatLng> getAllLatLng();
+
+	public List<LatLng> getPositionListByBodno(LatLng latlng);
+
 }

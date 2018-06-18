@@ -14,7 +14,27 @@
 	src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 
 </head>
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#searchBtn").click(function(){
+		var search = $("#search").val();
+		console.log("검색버튼 눌렸고 search는 "+search);
+		$.ajax({
+			type:'get',
+			url:'/traVlog/followerFindBySearch.do?search='+search,
+			dataType:'html',
+			success:function(data){
+				console.log("아작스성공");
+				$(".left").html(data);
+			},error:function(e){
+				console.log("아작스 에러");
+			}
+		});//ajax끝
+	});
+});
 
+
+</script>
 <body>
 <div id="wrap">
 		

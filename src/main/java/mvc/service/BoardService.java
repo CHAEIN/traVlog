@@ -127,5 +127,13 @@ public class BoardService {
 	public List<Profile> getProfileList(Member boardMember) {
 		return boardDao.getProfileList(boardMember);
 	}
+
+	public List<LatLng> getAllLatLng() {
+		return boardDao.getAllLatLng();
+	}
+
+	public List<LatLng> getPositionListByBodno(LatLng latlng) {
+		return boardDao.getPositionListByBodno(latlng);
+	}
 	
 }

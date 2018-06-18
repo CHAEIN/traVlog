@@ -22,6 +22,10 @@
 		VALUES(#{memid},#{mempassword},#{memage},#{memnick},#{mememail},#{memphone},#{memsex})
 	</insert>
 	
+	<insert id="followAdmin" parameterType="mvc.dto.Member">
+      INSERT INTO tb_follow(memid, flwid) VALUES (#{memid}, 'travlog')
+   </insert>
+   
 	<select id="findId" parameterType="java.util.Map" resultType="String">
 		SELECT memid FROM TB_MEMBER where memname=#{idmemname} AND mememail=#{idmememail}
 	</select>
@@ -34,8 +38,32 @@
 		SELECT memid, memnick FROM tb_member where memid =#{memid}
 	</select>
 	
-	<select id="getProfile" parameterType="String" resultType="mvc.dto.Profile">
-		SELECT * FROM tb_profile WHERE memid=#{memid}
+   <select id="getProfile" parameterType="String" resultType="String">
+      SELECT pfsavefile
+      FROM (
+         select pfsavefile from tb_profile
+         where memnick=#{memnick}
+         order by PFDATE desc) p
+      WHERE rownum =1
+   </select>
+   
+   <select id="countProfile" parameterType="String" resultType="int" >
+   SELECT COUNT(pfsavefile) FROM tb_profile WHERE memnick=#{memnick}
+   </select>
+   
+   <select id="adInfo" resultType="mvc.dto.Advertising">
+   SELECT *
+      FROM (
+         select * from tb_advertising
+            WHERE advapprove=1
+            ORDER by advdate DESC) 
+      WHERE rownum =1
+   </select>
+   
+	<insert id="insertFollow" parameterType="mvc.dto.Follow">
+		INSERT INTO TB_FOLLOW(MEMID,FLWID) VALUES(#{memid},#{flwid})
+	</insert>
+	<select id="getMemberByNick" parameterType="mvc.dto.Member" resultType="mvc.dto.Member">
+		select * from tb_member where memnick=#{memnick}
 	</select>
-	
 </mapper>
